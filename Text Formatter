@@ -1,11 +1,4 @@
-/*************************************************
-Aufgabe Nr./Task No.: H2
-Nachname/Last,Family Name: Rahman
-Vorname/First,Given Name: Md.Mashiur
-Matrikelnummer/Matriculation number: 3003194
-Uni-Email: md.rahman.omi@stud.uni-due.de
-Studiengang/Course of Studies: ISE CE(Software)
-*************************************************/
+
 #include <iostream>
 #include <fstream>
 #include<string.h>
