@@ -1,0 +1,261 @@
+/*************************************************
+Aufgabe Nr./Task No.: H3
+Nachname/Last,Family Name: Rahman
+Vorname/First,Given Name: Md.Mashiur
+Matrikelnummer/Matriculation number: 3003194
+Uni-Email: md.rahman.omi@stud.uni-due.de
+Studiengang/Course of Studies: ISE (Software)
+*************************************************/
+
+#include <iostream>
+#include <string>		/* string utils */
+#include <stdlib.h>     /* srand, rand */
+using namespace std;
+
+/*
+ * Computer Player Class
+ */
+class ComputerPlayer{
+public:
+	//Constructor
+	ComputerPlayer() {
+		// set Seed Value
+		setSeed();
+		/* initialize random seed: */
+		srand(seed);
+	}
+	//Distructor
+	~ComputerPlayer() {}
+	// calculate and return the row and column as one 2-digits number by random numbers
+	int nextTurn(){
+		// generate row number between 1 and 3
+		int rowValue = rand() % 3 + 1;
+		// generate column number between 1 and 3
+		int columnValue = (rand() % 3 + 1);
+		// return value is 2-digit number (first digit => row number, second digit => column number )
+		return (rowValue * 10) + columnValue;
+	}
+private:
+	int seed;
+	// Set Seed Value
+	void setSeed(){
+		cout << endl << "seed value for initialization of random number generator: ";
+		cin >> seed;
+	}
+};
+
+
+/*
+ * Human Player Class
+ */
+class HumanPlayer{
+public:
+	//Constructor
+	HumanPlayer() {
+		setName();
+	}
+	//Distructor
+	~HumanPlayer() {}
+	// Get Human Player Name
+	string getName(){ return name; }
+	// ask, calculate and return the row and column as one 2-digits number
+	// return 0 in error
+	int nextTurn(){
+		string input = "";
+		int returnValue = 0;
+		cout << endl << name << " (x), please give row (1,2,3) and column (a,b,c): ";
+		cin >> input;
+		// Only acccept correct input
+		if (input.length() != 2)
+			cout << "wrong input, please try again!" << endl;
+		else{
+			// determin row value
+			switch (input[0]) {
+				case '1': returnValue = 10; break;
+				case '2':returnValue = 20; break;
+				case '3':returnValue = 30; break;
+				default: cout << "wrong row, please try again!" << endl; returnValue = 0;
+			}
+			// determin column value
+			switch (input[1]) {
+				case 'a': case 'A': returnValue += 1; break;
+				case 'b': case 'B': returnValue += 2; break;
+				case 'c': case 'C': returnValue += 3; break;
+				default: cout << "wrong column, please try again!" << endl; returnValue = 0;
+			}
+		}
+		// return value is 2-digit number (first digit => row number, second digit => column number )
+		return returnValue;
+	}
+private:
+	string name;
+	// Set Human Player Name
+	void setName(){
+		cout << endl << "What's your name? ";
+		cin >> name;
+	}
+};
+
+/*
+* Game Board Class
+*/
+class GameBoard{
+public:
+	//Constructor
+	GameBoard() {
+		clearBoard();
+	}
+	void clearBoard(){
+		for (int i = 0; i < 3; i++)
+			for (int j = 0; j < 3; j++)
+				board[i][j] = ' ';
+	}
+	//Distructor
+	~GameBoard() {}
+	// output the gameboard in ASCII
+	void drawBoard(){
+		cout << endl;
+		cout << "  a b c " << endl;
+		for (int i = 0; i < 3; i++){
+			cout << i + 1 << " ";
+			for (int j = 0; j < 2; j++){
+				cout << board[i][j] << "|";
+			}
+			cout << board[i][2] << endl;
+			if ( i<2 )
+				cout << "  -+-+- " << endl;
+		}
+	}
+	// make a move
+	bool makeMove(int rowColumn, char sign){
+		int row = rowColumn / 10;
+		int column = rowColumn % 10;
+		switch (board[row - 1][column - 1]){
+			// the playing field is already occupied
+			// move is not possible => return false
+			case 'o':case 'x':
+				if ( sign=='x' )
+					cout << "place occupied, please try again!" << endl;
+				return false;
+			// move is allowed => set the sign and return true
+			case ' ':
+				board[row - 1][column - 1] = sign;
+				return true;
+			default:
+				return false;
+		}
+	}
+	// check if the game is over
+	bool checkBoard(string humanName){
+		// check if human has won
+		if (isPlayerWon('x')) {
+			cout << endl << humanName << " you win!" << endl;
+			return true;
+		}
+		if (isPlayerWon('o')) {
+			cout << endl << "Computer wins!" << endl;
+			return true;
+		}
+		// check if game ends in a tie
+		bool emptyField = false;
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 3; j++) {
+				if (board[i][j] == ' '){
+					emptyField = true;
+					break;
+				}
+			}
+			if (emptyField) break;
+		}
+		// there is empty field
+		if (emptyField){
+			return false;
+		}
+		// no more moves are possible
+		else{
+			cout << endl << "The game ends in a tie!" << endl;
+			return true;
+		}
+
+	}
+	// check if a player has won base on sign ( 'o' for computer, 'x' for human)
+	bool isPlayerWon(char sign){
+
+		// check first row
+		if (board[0][0] == sign && board[0][1] == sign && board[0][2] == sign)
+			return true;
+		// check second row
+		if (board[1][0] == sign && board[1][1] == sign && board[1][2] == sign)
+			return true;
+		// check third row
+		if (board[2][0] == sign && board[2][1] == sign && board[2][2] == sign)
+			return true;
+
+		// check first column
+		if (board[0][0] == sign && board[1][0] == sign && board[2][0] == sign)
+			return true;
+		// check second column
+		if (board[0][1] == sign && board[1][1] == sign && board[2][1] == sign)
+			return true;
+		// check third column
+		if (board[0][2] == sign && board[1][2] == sign && board[2][2] == sign)
+			return true;
+
+		// check diagonal lines
+		if (board[0][0] == sign && board[1][1] == sign && board[2][2] == sign)
+			return true;
+		if (board[0][2] == sign && board[1][1] == sign && board[2][0] == sign)
+			return true;
+
+		// if no if match => not won
+		return false;
+	}
+private:
+	char board[3][3];
+};
+
+/*
+ * Game control
+ */
+int main() {
+
+	cout << "Tic Tac Toe" << endl;
+	cout << "===========" << endl;
+	// initialization
+	ComputerPlayer computer;
+	HumanPlayer human;
+	GameBoard board;
+
+	// replay loop
+	char input = ' ' ;
+	do{
+		// who play first
+		do{
+			cout << endl << "who starts (c=computer or h=human)? ";
+			cin >> input;
+		} while ( input != 'c' && input != 'h' );
+
+		int move;
+		while (!board.checkBoard(human.getName())) {
+			if (input == 'c'){
+				do{
+					move = computer.nextTurn();
+				} while (!board.makeMove(move, 'o'));
+				board.drawBoard();
+			}
+			if (input == 'h'){
+				do{
+					move = human.nextTurn();
+				} while (!board.makeMove(move, 'x'));
+				board.drawBoard();
+			}
+			if (input == 'c') input = 'h';
+			else input = 'c';
+
+		}
+		board.clearBoard();
+		// want a replay?
+		cout << endl << "you want to play once more (n=no, y=yes)? ";
+		cin >> input;
+	} while (input == 'y');
+}
